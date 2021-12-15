@@ -4,8 +4,13 @@
 </template>
 
 <script>
+import store from '../store'
+
 export default {
-  name: 'CatManager'
+  name: 'CatManager',
+  created: () => {
+    store.dispatch('get')
+  }
 }
 </script>
 
