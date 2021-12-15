@@ -1,16 +1,19 @@
 <template>
   <div class="container">
+    <ul>
+      <li v-for="cat in cats" :key="cat.name">
+        {{cat.name}}
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
-import store from '../store'
+import { mapState } from 'vuex'
 
 export default {
   name: 'CatManager',
-  created: () => {
-    store.dispatch('get')
-  }
+  computed: { ...mapState(['cats']) }
 }
 </script>
 
