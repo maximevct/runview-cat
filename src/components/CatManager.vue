@@ -1,10 +1,11 @@
 <template>
   <v-container fluid>
     <v-row>
-      <cat-create :handler="addCat"/>
+      <v-col>
+        <cat-create :handler="addCat"/>
+      </v-col>
     </v-row>
-    <v-row
-      class="pa-4">
+    <v-row>
       <v-col>
         <v-toolbar
           class="mb-4"
@@ -57,7 +58,7 @@
 
         <v-row>
           <v-col
-            v-for="cat in cats.filter(e => e.visible)"
+            v-for="cat in visibleCats"
             :key="cat.name"
             cols="4"
           >
@@ -98,7 +99,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import CatEdit from './CatEdit.vue'
 import CatCreate from './CatCreate.vue'
 import store from '../store'
@@ -123,7 +124,8 @@ export default {
   }),
   components: { CatEdit, CatCreate },
   computed: {
-    ...mapState(['cats'])
+    ...mapState(['cats']),
+    ...mapGetters(['visibleCats'])
   },
   created: () => {
     store.dispatch('sortCats', { key: 'name', isDesc: false })

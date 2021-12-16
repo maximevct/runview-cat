@@ -43,6 +43,7 @@ export default new Vuex.Store({
   actions: {
     add: ({ commit, state }, cat) => {
       cat.id = cat.id >= 0 ? cat.id : Math.max(...state.cats.map(e => e.id)) + 1
+      cat.visible = true
       commit('add', cat)
     },
     remove: ({ commit }, cat) => {
@@ -59,5 +60,8 @@ export default new Vuex.Store({
     }
   },
   modules: {
+  },
+  getters: {
+    visibleCats: state => state.cats.filter(e => e.visible)
   }
 })
