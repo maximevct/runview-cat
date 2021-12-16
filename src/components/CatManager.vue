@@ -64,10 +64,8 @@
             <v-col
               v-for="cat in props.items"
               :key="cat.name"
-              cols="12"
-              sm="6"
-              md="4"
-              lg="3"
+              cols="3"
+              class="d-flex align-stretch"
             >
               <v-card>
                 <v-card-title>
@@ -75,9 +73,19 @@
                   <v-icon v-if="cat.sexe === 'Femelle'">mdi-gender-female</v-icon>
                   <v-icon v-if="cat.sexe === 'Mâle'">mdi-gender-male</v-icon>
                 </v-card-title>
+                <v-card-subtitle>{{cat.race}}</v-card-subtitle>
+                <v-divider></v-divider>
                 <v-card-text>
-                  <v-row>{{cat.sexe}}</v-row>
+                  <v-row>
+                    <v-col cols="6">Né{{cat.sexe === 'Femelle' ? 'e' : ''}} le {{cat.birthdate | translateDate}}</v-col>
+                    <v-col cols="6">{{cat.price | formatPrice}} €</v-col>
+                  </v-row>
                 </v-card-text>
+                <v-divider></v-divider>
+                <v-card-text>
+                  <v-row>{{cat.comment}}</v-row>
+                </v-card-text>
+                <v-divider></v-divider>
                 <v-card-actions>
                   <cat-edit :handler="updateCat" :cat="cat" />
                   <button v-on:click="removeCat(cat)">Remove</button>
@@ -92,58 +100,61 @@
             align="center"
             justify="center"
           >
-            <span class="grey--text">Items per page</span>
-            <v-menu offset-y>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  dark
-                  text
-                  color="primary"
-                  class="ml-2"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  {{ itemsPerPage }}
-                  <v-icon>mdi-chevron-down</v-icon>
-                </v-btn>
-              </template>
-              <v-list>
-                <v-list-item
-                  v-for="(number, index) in itemsPerPageArray"
-                  :key="index"
-                  @click="updateItemsPerPage(number)"
-                >
-                  <v-list-item-title>{{ number }}</v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
-
+            <v-col>
+              <span class="grey--text">Items per page</span>
+              <v-menu offset-y>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    dark
+                    text
+                    color="primary"
+                    class="ml-2"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    {{ itemsPerPage }}
+                    <v-icon>mdi-chevron-down</v-icon>
+                  </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item
+                    v-for="(number, index) in itemsPerPageArray"
+                    :key="index"
+                    @click="updateItemsPerPage(number)"
+                  >
+                    <v-list-item-title>{{ number }}</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </v-col>
             <v-spacer></v-spacer>
-
-            <span
-              class="mr-4
-              grey--text"
-            >
-              Page {{ page }} of {{ numberOfPages }}
-            </span>
-            <v-btn
-              fab
-              dark
-              color="blue darken-3"
-              class="mr-1"
-              @click="formerPage"
-            >
-              <v-icon>mdi-chevron-left</v-icon>
-            </v-btn>
-            <v-btn
-              fab
-              dark
-              color="blue darken-3"
-              class="ml-1"
-              @click="nextPage"
-            >
-              <v-icon>mdi-chevron-right</v-icon>
-            </v-btn>
+            <v-col
+              class="text-right">
+              <span
+                class="mr-4
+                grey--text"
+              >
+                Page {{ page }} of {{ numberOfPages }}
+              </span>
+              <v-btn
+                fab
+                dark
+                color="blue darken-3"
+                class="mr-1"
+                @click="formerPage"
+              >
+                <v-icon>mdi-chevron-left</v-icon>
+              </v-btn>
+              <v-btn
+                fab
+                dark
+                color="blue darken-3"
+                class="ml-1"
+                @click="nextPage"
+              >
+                <v-icon>mdi-chevron-right</v-icon>
+              </v-btn>
+            </v-col>
           </v-row>
         </template>
       </v-data-iterator>
@@ -156,6 +167,9 @@ import { mapState } from 'vuex'
 import CatEdit from './CatEdit.vue'
 import CatCreate from './CatCreate.vue'
 import store from '../store'
+import moment from 'moment'
+
+moment.locale('fr')
 
 export default {
   name: 'CatManager',
@@ -204,6 +218,14 @@ export default {
     },
     updateItemsPerPage (number) {
       this.itemsPerPage = number
+    }
+  },
+  filters: {
+    translateDate: function (date) {
+      return moment(date).format('LL')
+    },
+    formatPrice: function (p) {
+      return p.toFixed(2)
     }
   }
 }
