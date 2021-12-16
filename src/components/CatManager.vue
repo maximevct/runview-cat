@@ -3,161 +3,91 @@
     <v-row>
       <cat-create :handler="addCat"/>
     </v-row>
-    <v-row>
-      <v-data-iterator
-        :items="cats"
-        :items-per-page.sync="itemsPerPage"
-        :page.sync="page"
-        :search="search"
-        :sort-by="sortBy.toLowerCase()"
-        :sort-desc="sortDesc"
-        hide-default-footer
-      >
-        <template v-slot:header>
-          <v-toolbar>
-            <v-text-field
-              v-model="search"
-              clearable
+    <v-row
+      class="pa-4">
+      <v-col>
+        <v-toolbar
+          class="mb-4"
+          dark>
+          <v-text-field
+            v-on:change="searchCat"
+            v-model="search"
+            clearable
+            flat
+            solo-inverted
+            hide-details
+            prepend-inner-icon="mdi-magnify"
+            label="Rechercher"
+          ></v-text-field>
+            <v-spacer></v-spacer>
+            <v-select
+              v-model="sortBy"
               flat
               solo-inverted
               hide-details
-              prepend-inner-icon="mdi-magnify"
-              label="Search"
-            ></v-text-field>
-            <template v-if="$vuetify.breakpoint.mdAndUp">
-              <v-spacer></v-spacer>
-              <v-select
-                v-model="sortBy"
-                flat
-                solo-inverted
-                hide-details
-                :items="keys"
-                prepend-inner-icon="mdi-magnify"
-                label="Sort by"
-              ></v-select>
-              <v-spacer></v-spacer>
-              <v-btn-toggle
-                v-model="sortDesc"
-                mandatory
-              >
-                <v-btn
-                  large
-                  depressed
-                  :value="false"
-                >
-                  <v-icon>mdi-arrow-up</v-icon>
-                </v-btn>
-                <v-btn
-                  large
-                  depressed
-                  :value="true"
-                >
-                  <v-icon>mdi-arrow-down</v-icon>
-                </v-btn>
-              </v-btn-toggle>
-            </template>
-          </v-toolbar>
-        </template>
-
-        <template v-slot:default="props">
-          <v-row>
-            <v-col
-              v-for="cat in props.items"
-              :key="cat.name"
-              cols="3"
-              class="d-flex align-stretch"
-            >
-              <v-card>
-                <v-card-title>
-                  {{cat.name}}
-                  <v-icon v-if="cat.sexe === 'Femelle'">mdi-gender-female</v-icon>
-                  <v-icon v-if="cat.sexe === 'Mâle'">mdi-gender-male</v-icon>
-                </v-card-title>
-                <v-card-subtitle>{{cat.race}}</v-card-subtitle>
-                <v-divider></v-divider>
-                <v-card-text>
-                  <v-row>
-                    <v-col cols="6">Né{{cat.sexe === 'Femelle' ? 'e' : ''}} le {{cat.birthdate | translateDate}}</v-col>
-                    <v-col cols="6">{{cat.price | formatPrice}} €</v-col>
-                  </v-row>
-                </v-card-text>
-                <v-divider></v-divider>
-                <v-card-text>
-                  <v-row>{{cat.comment}}</v-row>
-                </v-card-text>
-                <v-divider></v-divider>
-                <v-card-actions>
-                  <cat-edit :handler="updateCat" :cat="cat" />
-                  <button v-on:click="removeCat(cat)">Remove</button>
-                </v-card-actions>
-              </v-card>
-            </v-col>
-          </v-row>
-        </template>
-
-        <template v-slot:footer>
-          <v-row
-            align="center"
-            justify="center"
-          >
-            <v-col>
-              <span class="grey--text">Items per page</span>
-              <v-menu offset-y>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    dark
-                    text
-                    color="primary"
-                    class="ml-2"
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    {{ itemsPerPage }}
-                    <v-icon>mdi-chevron-down</v-icon>
-                  </v-btn>
-                </template>
-                <v-list>
-                  <v-list-item
-                    v-for="(number, index) in itemsPerPageArray"
-                    :key="index"
-                    @click="updateItemsPerPage(number)"
-                  >
-                    <v-list-item-title>{{ number }}</v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </v-col>
+              :items="keys"
+              item-text="text"
+              item-value="id"
+              prepend-inner-icon="mdi-filter"
+              label="Trier par"
+              v-on:change="sortCats"
+            ></v-select>
             <v-spacer></v-spacer>
-            <v-col
-              class="text-right">
-              <span
-                class="mr-4
-                grey--text"
-              >
-                Page {{ page }} of {{ numberOfPages }}
-              </span>
+            <v-btn-toggle
+              v-model="sortDesc"
+              v-on:change="sortCats"
+              mandatory
+            >
               <v-btn
-                fab
-                dark
-                color="blue darken-3"
-                class="mr-1"
-                @click="formerPage"
+                large
+                depressed
+                :value="false"
               >
-                <v-icon>mdi-chevron-left</v-icon>
+                <v-icon>mdi-arrow-up</v-icon>
               </v-btn>
               <v-btn
-                fab
-                dark
-                color="blue darken-3"
-                class="ml-1"
-                @click="nextPage"
+                large
+                depressed
+                :value="true"
               >
-                <v-icon>mdi-chevron-right</v-icon>
+                <v-icon>mdi-arrow-down</v-icon>
               </v-btn>
-            </v-col>
-          </v-row>
-        </template>
-      </v-data-iterator>
+            </v-btn-toggle>
+        </v-toolbar>
+
+        <v-row>
+          <v-col
+            v-for="cat in cats.filter(e => e.visible)"
+            :key="cat.name"
+            cols="4"
+          >
+            <v-card>
+              <v-card-title>
+                {{cat.name}}
+                <v-icon v-if="cat.sexe === 'Femelle'">mdi-gender-female</v-icon>
+                <v-icon v-if="cat.sexe === 'Mâle'">mdi-gender-male</v-icon>
+              </v-card-title>
+              <v-card-subtitle>{{cat.race}}</v-card-subtitle>
+              <v-divider></v-divider>
+              <v-card-text>
+                <v-row>
+                  <v-col cols="6">Né{{cat.sexe === 'Femelle' ? 'e' : ''}} le {{cat.birthdate | translateDate}}</v-col>
+                  <v-col cols="6">{{cat.price | formatPrice}} €</v-col>
+                </v-row>
+              </v-card-text>
+              <v-divider></v-divider>
+              <v-card-text>
+                <v-row>{{cat.comment}}</v-row>
+              </v-card-text>
+              <v-divider></v-divider>
+              <v-card-actions>
+                <cat-edit :handler="updateCat" :cat="cat" />
+                <button v-on:click="removeCat(cat)">Remove</button>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -174,31 +104,24 @@ moment.locale('fr')
 export default {
   name: 'CatManager',
   data: () => ({
-    itemsPerPageArray: [4, 8, 12],
     search: '',
-    filter: {},
     sortDesc: false,
-    page: 1,
-    itemsPerPage: 4,
     sortBy: 'name',
     keys: [
-      'name',
-      'sexe',
-      'birthdate',
-      'race',
-      'price',
-      'comment'
+      { id: 'name', text: 'Nom' },
+      { id: 'sexe', text: 'Sexe' },
+      { id: 'birthdate', text: 'Date de naissance' },
+      { id: 'race', text: 'Race' },
+      { id: 'price', text: 'Prix' },
+      { id: 'comment', text: 'Commentaire' }
     ]
   }),
   components: { CatEdit, CatCreate },
   computed: {
-    ...mapState(['cats']),
-    numberOfPages () {
-      return Math.ceil(this.cats.length / this.itemsPerPage)
-    },
-    filteredKeys () {
-      return this.keys.filter(key => key !== 'Name')
-    }
+    ...mapState(['cats'])
+  },
+  created: () => {
+    store.dispatch('sortCats', { key: 'name', isDesc: false })
   },
   methods: {
     addCat: (cat) => {
@@ -210,14 +133,11 @@ export default {
     updateCat: (cat) => {
       store.dispatch('update', cat)
     },
-    nextPage () {
-      if (this.page + 1 <= this.numberOfPages) this.page += 1
+    searchCat (search) {
+      store.dispatch('filter', search)
     },
-    formerPage () {
-      if (this.page - 1 >= 1) this.page -= 1
-    },
-    updateItemsPerPage (number) {
-      this.itemsPerPage = number
+    sortCats (sort) {
+      store.dispatch('sortCats', { key: this.sortBy, isDesc: this.sortDesc })
     }
   },
   filters: {
