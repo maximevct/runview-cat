@@ -16,7 +16,10 @@
       <v-card>
         <v-card-title>Modifier le chat</v-card-title>
         <v-card-text>
-          <v-form>
+          <v-form
+            ref="formUpdate"
+            lazy-validation
+          >
             <v-container>
               <v-row>
                 <v-col>
@@ -24,21 +27,26 @@
                     v-model="currentCat.name"
                     label="Nom"
                     required
+                    :rules="validateString"
                   ></v-text-field>
                   <v-text-field
                     v-model="currentCat.race"
                     label="Race"
                     required
+                    :rules="validateString"
                   ></v-text-field>
                   <v-select
                     :items="['Mâle', 'Femelle']"
                     v-model="currentCat.sexe"
                     label="Sexe"
+                    required
+                    :rules="validateRace"
                   ></v-select>
                   <v-text-field
                     v-model="currentCat.price"
                     label="Prix"
                     required
+                    :rules="validatePrice"
                   >
                     <v-icon
                       slot="prepend"
@@ -63,6 +71,8 @@
                         readonly
                         v-bind="attrs"
                         v-on="on"
+                        required
+                        :rules="validateDate"
                       ></v-text-field>
                     </template>
                     <v-date-picker
@@ -103,7 +113,7 @@
           <v-btn
             color="warning"
             v-on:click="checkValid">
-            Update
+            Modifier
           </v-btn>
           <v-btn
             color="danger"
@@ -117,20 +127,40 @@
 </template>
 
 <script>
+import moment from 'moment'
+
 export default {
   name: 'CatEdit',
   data: function () {
     return {
       isOpen: false,
       menuBirthdate: false,
-      currentCat: { ...this.cat }
+      currentCat: { },
+      validateString: [
+        value => !!value || 'Requis',
+        value => (value || '').length <= 50 || 'Longueur Max 50'
+      ],
+      validateDate: [
+        value => !!value || 'Requis',
+        value => (moment(value).isBefore(moment()) && moment(value).isAfter(moment().subtract(50, 'years'))) || 'Date invalide'
+      ],
+      validatePrice: [
+        value => !!value || 'Requis',
+        value => value >= 0 || 'Doit être positif'
+      ],
+      validateRace: [
+        value => !!value || 'Requis',
+        value => ['Mâle', 'Femelle'].indexOf(value) >= 0 || 'Doit être valide'
+      ]
     }
   },
   props: ['handler', 'cat'],
   methods: {
     checkValid: function () {
-      this.handler({ ...this.currentCat })
-      this.isOpen = false
+      if (this.$refs.formUpdate.validate()) {
+        this.handler({ ...this.currentCat, price: parseFloat(this.currentCat.price) })
+        this.isOpen = false
+      }
     }
   },
   watch: {

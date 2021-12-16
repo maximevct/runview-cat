@@ -159,7 +159,7 @@ export default {
   methods: {
     checkValid: function () {
       if (this.$refs.formCreate.validate()) {
-        this.handler({ ...this.currentCat })
+        this.handler({ ...this.currentCat, price: parseFloat(this.currentCat.price) })
         this.isOpen = false
       }
     }
