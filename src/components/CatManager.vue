@@ -82,7 +82,12 @@
               <v-divider></v-divider>
               <v-card-actions>
                 <cat-edit :handler="updateCat" :cat="cat" />
-                <button v-on:click="removeCat(cat)">Remove</button>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="error"
+                  v-on:click="removeCat(cat)">
+                  Remove<v-icon>mdi-delete</v-icon>
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-col>

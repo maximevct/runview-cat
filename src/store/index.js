@@ -17,7 +17,13 @@ export default new Vuex.Store({
       state.cats.splice(state.cats.findIndex(e => e.id === cat.id), 1)
     },
     update (state, cat) {
-      state.cats[state.cats.findIndex(e => e.id === cat.id)].name = cat.name
+      const originalCat = state.cats[state.cats.findIndex(e => e.id === cat.id)]
+      originalCat.name = cat.name
+      originalCat.price = cat.price
+      originalCat.sexe = cat.sexe
+      originalCat.comment = cat.comment
+      originalCat.birthdate = cat.birthdate
+      originalCat.race = cat.race
     },
     filter (state, search) {
       state.cats = state.cats.map(e => ({ ...e, visible: e.name.toLowerCase().search(search.toLowerCase()) !== -1 }))
