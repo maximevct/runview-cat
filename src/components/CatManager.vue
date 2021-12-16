@@ -60,7 +60,9 @@
           <v-col
             v-for="cat in visibleCats"
             :key="cat.name"
-            cols="4"
+            lg="4"
+            md="6"
+            sm="12"
           >
             <v-card>
               <v-card-title>
