@@ -1,7 +1,12 @@
 <template>
-  <div id="app">
-    <CatManager />
-  </div>
+  <v-app>
+    <v-app-bar app>
+      Cat Manager
+    </v-app-bar>
+    <v-main>
+      <CatManager />
+    </v-main>
+  </v-app>
 </template>
 
 <script>
