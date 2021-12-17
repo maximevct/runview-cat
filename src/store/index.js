@@ -1,15 +1,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-const ALL_CATS = require('./cat.json').map((e, i) => ({ ...e, id: i, visible: true }))
-
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    cats: ALL_CATS
+    cats: []
   },
   mutations: {
+    set (state, cats) {
+      state.cats = cats
+    },
     add (state, cat) {
       state.cats.push(cat)
     },
@@ -28,11 +29,11 @@ export default new Vuex.Store({
     filter (state, search) {
       state.cats = state.cats.map(e => ({ ...e, visible: e.name.toLowerCase().search(search.toLowerCase()) !== -1 }))
     },
-    sortCats (state, sort) {
+    sort (state, sort) {
       return state.cats.sort((a, b) => {
         let res = 0
         if (['name', 'race', 'comment', 'sexe'].indexOf(sort.key) >= 0) {
-          res = a[sort.key].toLowerCase() < b[sort.key].toLowerCase() ? 1 : -1
+          res = a[sort.key].toLowerCase() < b[sort.key].toLowerCase() ? -1 : 1
         } else {
           res = a[sort.key] < b[sort.key] ? -1 : 1
         }
@@ -41,6 +42,10 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    get: ({ commit }) => {
+      commit('set', require('./cat.json').map((e, i) => ({ ...e, id: i, visible: true })))
+      commit('sort', { key: 'name', isDesc: false })
+    },
     add: ({ commit, state }, cat) => {
       cat.id = cat.id >= 0 ? cat.id : Math.max(...state.cats.map(e => e.id)) + 1
       cat.visible = true
@@ -55,8 +60,8 @@ export default new Vuex.Store({
     filter: ({ commit }, search) => {
       commit('filter', search)
     },
-    sortCats: ({ commit }, sort) => {
-      commit('sortCats', sort)
+    sort: ({ commit }, sort) => {
+      commit('sort', sort)
     }
   },
   modules: {

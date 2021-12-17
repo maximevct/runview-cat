@@ -1,8 +1,17 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col>
+      <v-col
+      cols="10">
         <cat-create :handler="addCat"/>
+      </v-col>
+      <v-col
+        cols="2">
+        <v-btn
+          color="warning"
+          v-on:click="resetCats">
+          Réinitialiser
+        </v-btn>
       </v-col>
     </v-row>
     <v-row>
@@ -130,11 +139,15 @@ export default {
     ...mapGetters(['visibleCats'])
   },
   created: () => {
-    store.dispatch('sortCats', { key: 'name', isDesc: false })
+    store.dispatch('get')
   },
   methods: {
     addCat: (cat) => {
       store.dispatch('add', cat)
+    },
+    resetCats: function () {
+      store.dispatch('get')
+      this.sortCats()
     },
     removeCat: (cat) => {
       store.dispatch('remove', cat)
@@ -146,7 +159,7 @@ export default {
       store.dispatch('filter', search)
     },
     sortCats (sort) {
-      store.dispatch('sortCats', { key: this.sortBy, isDesc: this.sortDesc })
+      store.dispatch('sort', { key: this.sortBy, isDesc: this.sortDesc })
     }
   },
   filters: {
